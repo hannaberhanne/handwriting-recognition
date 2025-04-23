@@ -12,6 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Data transforms for EMNIST images
 transform_train = transforms.Compose([
+    transforms.Lambda(lambda img: transforms.functional.rotate(img, -90)),
     transforms.RandomRotation(10),
     transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),
     transforms.Resize((28, 28)),
@@ -20,6 +21,7 @@ transform_train = transforms.Compose([
 ])
 
 transform_test = transforms.Compose([
+    transforms.Lambda(lambda img: transforms.functional.rotate(img, -90)),
     transforms.Resize((28, 28)),
     transforms.ToTensor(),
     transforms.Lambda(lambda x: 1 - x)
@@ -142,6 +144,9 @@ def predict_custom_image(path):
     normalized = resized.astype('float32') / 255.0
     tensor = torch.tensor(normalized).unsqueeze(0).unsqueeze(0).to(device)
 
+    # Invert (Swap White and Black)
+    tensor = 1.0 - tensor
+    
     # Predict
     model.eval()
     with torch.no_grad():
