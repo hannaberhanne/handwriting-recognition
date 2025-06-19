@@ -30,6 +30,7 @@ for method in methods:
 
         gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         col_sum = np.sum(gray_img < 200, axis=0)
+        print("Here is the Shape of gray_img", gray_img.shape)
 
         left_edge = 0
         for x_pos, val in enumerate(col_sum):
@@ -37,10 +38,10 @@ for method in methods:
                 left_edge = max(0, x_pos - 10)
                 break
 
-        right_edge = gray_img.shape[1] // 2
-        for x_pos in range(left_edge, gray_img.shape[1] // 2):
-            if col_sum[x_pos] < 5:
-                right_edge = x_pos + 10
+        right_edge = gray_img.shape[1]
+        for x_pos in range(gray_img.shape[1] - 1, left_edge, -1):
+            if col_sum[x_pos] > gray_img.shape[0] * 0.05:
+                right_edge = min(gray_img.shape[1], x_pos + 10)
                 break
 
         cropped_img = image[:, left_edge:right_edge]
