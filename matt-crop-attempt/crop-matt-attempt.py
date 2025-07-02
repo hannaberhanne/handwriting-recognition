@@ -56,8 +56,8 @@ def white_both_side(row, col, img):
 # Returns the subset of the image that contains the box
 def find_box(start_row, start_col, img):
 
-    num_row = image.shape[0]
-    num_col = image.shape[1]
+    num_row = img.shape[0]
+    num_col = img.shape[1]
 
     ### Let's find the upper-left corner of a box of text
 
@@ -65,9 +65,9 @@ def find_box(start_row, start_col, img):
     upper_left_c = start_col
 
     for r in range(start_row,num_row):
-        if row_both_white_black(r, image):
-            c = find_black_col(r, start_col,image)
-            if white_both_side(r, c, image):
+        if row_both_white_black(r, img):
+            c = find_black_col(r, start_col,img)
+            if white_both_side(r, c, img):
                 print(f"Found Upper-Left -- Row: {r}, Col: {c}")
                 upper_left_r = r
                 upper_left_c = c
@@ -82,20 +82,20 @@ def find_box(start_row, start_col, img):
     new_col = upper_left_c + DELTA - 1
 
     while not found_right_side_of_box:
-        new_col = find_black_col(new_row, new_col, image)
-        if white_both_side(new_row, new_col, image):
+        new_col = find_black_col(new_row, new_col, img)
+        if white_both_side(new_row, new_col, img):
             found_right_side_of_box = True
 
 
     # Go down the image until you find a solid black horizontal line
-    while white_both_side(new_row, new_col, image):
+    while white_both_side(new_row, new_col, img):
         new_row = new_row + 1
 
     lower_right_r = new_row
     lower_right_c = new_col
 
 
-    cropped_img = image[upper_left_r : lower_right_r, upper_left_c : lower_right_c, :]
+    cropped_img = img[upper_left_r : lower_right_r, upper_left_c : lower_right_c, :]
     print(f"Shape of Cropped Image: {cropped_img.shape}")
     return cropped_img
 
@@ -104,7 +104,7 @@ def find_box(start_row, start_col, img):
 ###################################
 
 
-img_file = "page_02.png"
+img_file = "data/processed/cleaned/morphology/page_03.png"
 
 image = cv2.imread(img_file)
 
@@ -116,4 +116,3 @@ cropped_img = find_box(500,500,image)
 save_file_name = "test_crop.png"
 cv2.imwrite(save_file_name, cropped_img)
 print(f"  Done saving cropped image to: {save_file_name}")
-
