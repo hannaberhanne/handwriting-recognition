@@ -30,7 +30,6 @@ for method in methods:
 
         gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         col_sum = np.sum(gray_img < 200, axis=0)
-        print("Here is the Shape of gray_img", gray_img.shape)
 
         left_edge = 0
         for x_pos, val in enumerate(col_sum):
