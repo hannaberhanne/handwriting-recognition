@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 import os
+import random
 import matplotlib.pyplot as plt
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -11,6 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Corrected data transforms
 transform = transforms.Compose([
     transforms.Lambda(lambda img: transforms.functional.rotate(img, -90)),
+    transforms.RandomHorizontalFlip(p=1),
     transforms.Resize((28, 28)),
     transforms.ToTensor(),
     transforms.Lambda(lambda x: 1 - x)  # Invert: black background, white letter
@@ -98,34 +100,61 @@ def evaluate_model():
             total += labels.size(0)
     
     accuracy = 100 * correct / total
+    print(f"Total Tests: {total}") 
     print(f"Test Accuracy: {accuracy:.2f}%")
     return accuracy
 
-# Quick training (5 minutes on GPU, ~15 on CPU)
+### Quick training (5 minutes on GPU, ~15 on CPU)
 train_model(epochs=5)
 accuracy = evaluate_model()
+
+# Load the trained model
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# model = LetterCNN().to(device)
+
+# Path to the trained EMNIST model
+model_path = "emnist_cnn_corrected.pth"
+if not os.path.exists(model_path):
+    raise FileNotFoundError(f"Model not found: {model_path}")
+
+model.load_state_dict(torch.load(model_path, map_location=device))
+evaluate_model()
+
 
 # Sample prediction visualization
 def show_sample_prediction():
     model.eval()
-    dataiter = iter(test_loader)
-    images, labels = next(dataiter)
-    images, labels = images.to(device), labels.to(device)
+    
+    #Pick Random Starting point in Test Data (to grab 5 images)
+    offset = random.randint(0, len(test_data))
+    print(f"Starting point is {offset} out of {len(test_data)}")
+
+    found = False
+    total = 0
     
     with torch.no_grad():
-        outputs = model(images)
-        _, preds = torch.max(outputs, 1)
+        for images, labels in test_loader:
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            _, predicted = torch.max(outputs, 1)
+            total += labels.size(0)
+            if (not found) and total >= offset:
+                found = True
+                save_images = images
+                save_labels = labels
+                save_preds = predicted
+
     
-    # Display first 5 images
+    # Display the 5 images    
     fig, axes = plt.subplots(1, 5, figsize=(15, 3))
     for i in range(5):
-        img = images[i].cpu().squeeze()
+        img = save_images[i].cpu().squeeze()
         axes[i].imshow(img, cmap='gray')
-        axes[i].set_title(f"True: {chr(labels[i].item()+65)}\nPred: {chr(preds[i].item()+65)}")
+        axes[i].set_title(f"True: {chr(save_labels[i].item()+65)}\nPred: {chr(save_preds[i].item()+65)}")
         axes[i].axis('off')
     plt.savefig("sample_predictions.png")
     print("Sample predictions saved as sample_predictions.png")
 
 show_sample_prediction()
 
-print(f"\nTraining complete! Final accuracy: {accuracy:.2f}%")
+# print(f"\nTraining complete! Final accuracy: {accuracy:.2f}%")
