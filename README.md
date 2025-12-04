@@ -60,64 +60,9 @@ This work was completed as part of the University of Tampa's Summer Undergraduat
 
 Supported by the University of Tampa Office of Undergraduate Research and Inquiry (OURI). Thanks to Dr. Kevin Fridy for providing archival access.
 
-## 📧 Contact
+## Contact
 
-For questions about this research, contact: [your email]
+For questions about this research, contact: [hanna.berhane@spartans.ut.edu]
 ```
 
 ---
-
-**2. Add These Files (Even if Empty Placeholders):**
-```
-/preprocessing/
-  - clahe_enhancement.py
-  - adaptive_threshold.py
-  - morphological_subtraction.py
-  
-/models/
-  - cnn_pytorch.py
-  - cnn_tensorflow.py
-  - train.py
-  
-/postprocessing/
-  - lexicon_match.py
-  - structural_analysis.py
-  
-/notebooks/
-  - 01_preprocessing_experiments.ipynb
-  - 02_model_training.ipynb
-  - 03_results_analysis.ipynb
-  
-/docs/
-  - SURF_poster.pdf
-  - methodology.md
-```
-
----
-
-**3. Add a Professional .gitignore**
-```
-# Python
-__pycache__/
-*.py[cod]
-*.so
-.Python
-env/
-venv/
-
-# Jupyter
-.ipynb_checkpoints
-
-# Data (if sensitive)
-data/raw/
-*.pdf
-
-# Models
-*.pth
-*.h5
-models/checkpoints/
-
-# IDE
-.vscode/
-.idea/
-*.swp
