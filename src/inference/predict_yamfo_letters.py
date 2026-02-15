@@ -7,7 +7,8 @@ import os
 import difflib
 
 DEBUG_SAVE = False
-DEBUG_DIR = os.path.join(os.path.dirname(__file__), "../debug_preprocessed")
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+DEBUG_DIR = os.path.join(BASE_DIR, "debug_preprocessed")
 
 # ---- Centering helper: crop by bbox, fit into 28x28 with aspect ----
 def _center_and_fit(img_gray: np.ndarray, pad: int = 2) -> np.ndarray:
@@ -79,7 +80,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = LetterCNN().to(device)
 
 # Path to the trained EMNIST model
-model_path = os.path.join(os.path.dirname(__file__), "../emnist_cnn_corrected.pth")
+model_path = os.path.join(BASE_DIR, "emnist_cnn_corrected.pth")
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"Model not found: {model_path}")
 
@@ -145,7 +146,7 @@ def match_closest_town(predicted, town_list):
 
 # Predict all letters from image files in a given folder and reconstruct the full name
 def predict_from_folder(folder_name):
-    folder_path = os.path.join(os.path.dirname(__file__), "../data", folder_name)
+    folder_path = os.path.join(BASE_DIR, "data", folder_name)
     if not os.path.isdir(folder_path):
         print("Folder not found:", folder_path)
         return

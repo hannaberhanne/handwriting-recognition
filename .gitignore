@@ -175,6 +175,7 @@ cython_debug/
 .DS_Store
 .venv/
 output/
+outputs/
 models/
 data/EMNIST/
 *.pt
@@ -186,3 +187,11 @@ data/EMNIST/
 
 # Raw EMNIST Data
 EMNIST/
+
+# Frontend build artifacts
+app/node_modules/
+app/dist/
+
+# Python caches and temp files
+**/__pycache__/
+*~

@@ -1,68 +1,76 @@
-# Teaching a Computer to Read: Digitizing Ghanaian Historical Records
+# Handwriting Recognition (Ghana OCR)
 
-Machine learning pipeline for recognizing handwritten place names from Ghana's National House of Chiefs archives.
+This repo currently has two tracks:
+- A working ML inference pipeline for letter-level recognition (`src/inference/predict_yamfo_matt.py`).
+- A web app stack (`api/` + `app/`) with API inference wired to the ML model.
 
-## Project Overview
+## Quick Start
 
-Historical records from Ghana's National House of Chiefs contain handwritten town names essential for research in history, linguistics, and governance—but remain digitally inaccessible. This project develops a lightweight CNN-based pipeline that achieves ~93% accuracy on benchmark data and 70-80% on archival samples.
-
-**Key Features:**
-- Character-level handwriting recognition using CNNs
-- Systematic preprocessing for degraded historical documents
-- Lexicon-aware postprocessing for Ghanaian place names
-- Built with PyTorch and TensorFlow
-
-## Impact
-
-- Makes handwritten Ghanaian archives searchable for the first time
-- Already being adopted by researchers in political science and economics
-- Provides reproducible framework for digitizing low-resource historical collections
-
-## Technical Approach
-
-**Pipeline Overview:**
-1. **Preprocessing**: CLAHE, adaptive thresholding, morphological background subtraction
-2. **Detection**: Automated name box extraction
-3. **Segmentation**: Character isolation and standardization
-4. **Classification**: CNN trained on EMNIST Letters (145,600 samples)
-5. **Postprocessing**: Structural analysis + lexicon matching
-
-**Results:**
-- 93% accuracy on EMNIST benchmark
-- 70-80% accuracy on real archival samples
-
-## Repository Structure
-```
-├── preprocessing/       # Image cleaning and preparation
-├── models/             # CNN implementations (PyTorch & TensorFlow)
-├── postprocessing/     # Lexicon matching and error correction
-├── data/               # Sample data and annotations
-├── notebooks/          # Jupyter notebooks with experiments
-└── results/            # Evaluation metrics and visualizations
+1. Create and activate env:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-## Research
-
-This work was completed as part of the University of Tampa's Summer Undergraduate Research Fellowship (SURF) 2025.
-
-**Presentations:**
-- UT SURF Symposium, August 2024
-
-**Publications:**
-- Manuscript in preparation for ACM/IEEE Joint Conference on Digital Libraries
-
-## Team
-
-**Hanna Berhane** - Computer Science, University of Tampa  
-**Dr. Matthew Lepinski** - Faculty Mentor, University of Tampa
-
-## Acknowledgments
-
-Supported by the University of Tampa Office of Undergraduate Research and Inquiry (OURI). Thanks to Dr. Kevin Fridy for providing archival access.
-
-## Contact
-
-For questions about this research, contact: [hanna.berhane@spartans.ut.edu]
+2. Install deps:
+```bash
+pip install -r requirements.txt
 ```
 
----
+3. Run a town prediction from `data/<folder>`:
+```bash
+python src/inference/predict_town.py --folder YAMFO
+python src/inference/predict_town.py --folder Bechem
+python src/inference/predict_town.py --folder Ataneata
+```
+
+## What Works Right Now
+
+- `src/inference/predict_yamfo_matt.py`
+  - Best current inference path.
+  - Loads `emnist_cnn_corrected.pth`.
+  - Uses multi-binarization + TTA + O/Q/D disambiguation + lexicon match.
+
+- `src/inference/predict_town.py`
+  - Unified runner for any `data/<folder>` containing letter PNGs.
+
+- `src/inference/predict_bechem.py`, `src/inference/predict_Ataneata.py`
+  - Thin wrappers over `src/inference/predict_town.py`.
+
+## Legacy / Experimental
+
+- `experiments/ind_study_emnist/`
+  - Training and experiments. Useful for research, not deployment.
+- `experiments/matt-crop-attempt/`, `src/experiments/archive/`
+  - Older segmentation/cropping experiments.
+- `src/inference/predict_yamfo_letters.py`
+  - Alternative inference approach (kept for comparison).
+
+## Project Layout (Current)
+
+```text
+handwriting-recognition/
+├── api/                    # FastAPI app scaffold (currently stub predictions)
+├── app/                    # React/Vite frontend scaffold
+├── data/                   # Input letters, raw scans, processed outputs
+├── experiments/            # Research/training sandboxes moved out of root
+├── src/
+│   ├── inference/
+│   ├── preprocess/
+│   └── experiments/
+├── outputs/                # generated figures/debug images
+├── docs/research/          # notes and status reports
+├── emnist_cnn_corrected.pth
+└── requirements.txt
+```
+
+Detailed path map: `docs/REPO_LAYOUT.md`.
+
+## API
+
+Run the backend:
+```bash
+uvicorn api.main:app --reload --port 8000
+```
+
+The `POST /predict` endpoint now calls the real model via `src/inference/predict_yamfo_matt.py` and returns top-3 predictions.
