@@ -222,13 +222,13 @@ def override_oqd(letter_top: str, probs: np.ndarray, img28_bw: np.ndarray) -> st
 
 
 # Predict a single capital letter from a given image
-def predict_letter(img_path):
+def predict_letter_with_details(img_path):
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     if img is None:
         print(f"Could not read {img_path}")
-        return None, "?"
+        return {"tensor": None, "letter": "?", "probs": None}
 
-    best = {"prob": -1.0, "letter": "?", "tensor": None}
+    best = {"prob": -1.0, "letter": "?", "tensor": None, "probs": None}
 
     for name, params in BIN_CONFIGS:
         try:
@@ -258,17 +258,31 @@ def predict_letter(img_path):
                 if top_p < 0.75 or margin < 0.12:
                     pred_letter = oqd_letter
 
+            adjusted_probs = probs.copy()
+            override_idx = ord(pred_letter) - 65
+            if override_idx != top_idx:
+                adjusted_probs[top_idx], adjusted_probs[override_idx] = (
+                    adjusted_probs[override_idx],
+                    adjusted_probs[top_idx],
+                )
+
             if top_p > best["prob"]:
                 best.update({
                     "prob": top_p,
                     "letter": pred_letter,
-                    "tensor": torch.tensor(disp_canvas.astype("float32")/255.0).unsqueeze(0).unsqueeze(0),
+                    "tensor": tensor,
+                    "probs": adjusted_probs,
                 })
-        except Exception as e:
+        except Exception:
             # be permissive; move on to next config
             continue
 
-    return best["tensor"], best["letter"]
+    return best
+
+
+def predict_letter(img_path):
+    result = predict_letter_with_details(img_path)
+    return result["tensor"], result["letter"]
 
 # List of known town names in Ahafo Region
 AHAFO_TOWNS = [

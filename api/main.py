@@ -53,12 +53,11 @@ async def predict(file: UploadFile = File(...)):
     with out_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    tensor, _ = inference.predict_letter(str(out_path))
-    if tensor is None:
+    result = inference.predict_letter_with_details(str(out_path))
+    tensor = result["tensor"]
+    probs = result["probs"]
+    if tensor is None or probs is None:
         raise HTTPException(status_code=422, detail="Could not read/parse input image for OCR.")
-
-    mean_logits = inference.predict_with_tta(tensor, inference.model, inference.device)
-    probs = inference.softmax_np(mean_logits.numpy())
     labels = [chr(i + 65) for i in range(26)]
 
     top_indices = probs.argsort()[::-1][:3]

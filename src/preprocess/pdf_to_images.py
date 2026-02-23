@@ -62,8 +62,8 @@ def safe_pdf_to_png(pdf_path, output_folder, dpi=72, max_size=(1654, 2340)):
 
 if __name__ == "__main__":
     # Configure paths
-    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    DATA_DIR = os.path.join(BASE_DIR, "data")
+    ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    DATA_DIR = os.path.join(ROOT_DIR, "data")
     
     # Process files with conservative settings
     safe_pdf_to_png(

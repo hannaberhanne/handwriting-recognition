@@ -18,13 +18,13 @@ def main() -> int:
         print(f"Sample image not found: {sample_img}")
         return 1
 
-    tensor, letter = inference.predict_letter(str(sample_img))
-    if tensor is None:
+    result = inference.predict_letter_with_details(str(sample_img))
+    tensor = result["tensor"]
+    letter = result["letter"]
+    probs = result["probs"]
+    if tensor is None or probs is None:
         print("Inference failed: image could not be processed.")
         return 1
-
-    logits = inference.predict_with_tta(tensor, inference.model, inference.device)
-    probs = inference.softmax_np(logits.numpy())
     labels = [chr(i + 65) for i in range(26)]
     top_idx = probs.argsort()[::-1][:3]
     top3 = [

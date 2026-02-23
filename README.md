@@ -74,3 +74,23 @@ uvicorn api.main:app --reload --port 8000
 ```
 
 The `POST /predict` endpoint now calls the real model via `src/inference/predict_yamfo_matt.py` and returns top-3 predictions.
+
+## Run It (Quick)
+
+From repo root:
+
+```bash
+source .venv/bin/activate
+uvicorn api.main:app --reload --port 8000
+```
+
+In a second terminal for the frontend:
+
+```bash
+cd app
+npm run dev
+```
+
+Useful links:
+- API docs: `http://localhost:8000/docs`
+- Frontend: `http://localhost:5173`
